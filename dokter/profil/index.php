@@ -3,18 +3,18 @@
     { 
         session_start(); 
     } 
-    if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
-      // Jika pengguna sudah login, tampilkan tombol "Logout"
-      header("Location: /bk-poliklinik/");
-      exit;
-  }
-    include_once("../koneksi.php");
+    if (!isset($_SESSION['username']) || $_SESSION['role'] != 'dokter') {
+        // Jika pengguna sudah login, tampilkan tombol "Logout"
+        header("Location: /bk-poliklinik/");
+        exit;
+    }
+    include_once("../../koneksi.php");
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<?php include('../layout/header.php');?>
+<?php include('../../layout/header.php');?>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
@@ -24,7 +24,7 @@
   </div>
 
   <!-- Navbar -->
-  <?php include('../layout/navbar.php');?>
+  <?php include('../../layout/navbar.php');?>
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
@@ -41,8 +41,8 @@
     { 
         session_start(); 
     }
-?>
-<div class="sidebar">
+    ?>
+    <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
@@ -68,51 +68,50 @@
       </div>
 
       <!-- Sidebar Menu -->
-    <nav class="mt-2">
+      <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-                <a href="/bk-poliklinik/admin" class="nav-link active">
+                <a href="/bk-poliklinik/dokter" class="nav-link">
                     <i class="nav-icon fas fa-th"></i>
                     <p>Dashboard
-                        <span class="right badge badge-success">Admin</span>
+                        <span class="right badge badge-primary">Dokter</span>
                     </p>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="../admin/dokter/" class="nav-link">
-                    <i class="nav-icon fas fa-user-md"></i>
-                    <p>Dokter
-                        <span class="right badge badge-success">Admin</span>
+                <a href="../jadwal/" class="nav-link">
+                <i class="nav-icon fas fa-clipboard"></i>
+                    <p>Jadwal Periksa
+                        <span class="right badge badge-primary">Dokter</span>
                     </p>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="../admin/pasien/" class="nav-link">
-                    <i class="nav-icon fas fa-user-injured"></i>
-                    <p>Pasien
-                        <span class="right badge badge-success">Admin</span>
+                <a href="../periksa/" class="nav-link">
+                <i class="nav-icon fas fa-stethoscope"></i>
+                    <p>Memeriksa Pasien
+                        <span class="right badge badge-primary">Dokter</span>
                     </p>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="../admin/poli/" class="nav-link">
-                    <i class="nav-icon fas fa-hospital"></i>
-                    <p>Poli
-                        <span class="right badge badge-success">Admin</span>
+                <a href="../riwayat/" class="nav-link">
+                <i class="nav-icon fas fa-notes-medical"></i>
+                    <p>Riwayat Pasien
+                        <span class="right badge badge-primary">Dokter</span>
                     </p>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="../admin/obat" class="nav-link">
-                    <i class="nav-icon fas fa-pills"></i>
-                    <p>Obat
-                        <span class="right badge badge-success">Admin</span>
+                <a href="../profil/" class="nav-link active">
+                <i class="nav-icon fas fa-user"></i>
+                    <p>Profile
+                        <span class="right badge badge-primary">Dokter</span>
                     </p>
                 </a>
             </li>
         </ul>
     </nav>
-
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
@@ -125,12 +124,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Dashboard</h1>
+            <h1 class="m-0">Profile</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="../admin">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard</li>
+              <li class="breadcrumb-item"><a href="../../dokter">Home</a></li>
+              <li class="breadcrumb-item active">Profile</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -145,7 +144,7 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-  <?php include('../layout/footer.php');?>
+  <?php include('../../layout/footer.php');?>
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
