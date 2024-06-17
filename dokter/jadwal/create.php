@@ -9,15 +9,19 @@
         exit;
     }
     include_once("../../koneksi.php");
+    if (isset($_POST['simpan'])) {
+        $nama_dokter = $_SESSION['username']; // Nama dokter yang sedang login
+        $id_dokter = $_SESSION['id']; // Asumsikan ada variabel session untuk ID dokter
 
-    if (isset($_GET['aksi'])) {
-        if ($_GET['aksi'] == 'hapus') {
-            $hapus = mysqli_query($mysqli, "DELETE FROM jadwal_periksa WHERE id = '" . $_GET['id'] . "'");
-        }
-
+        $hari = $_POST['hari'];
+        $jam_mulai = $_POST['jam_mulai'];
+        $jam_selesai = $_POST['jam_selesai'];
+ 
+        $tambah = mysqli_query($mysqli, "INSERT INTO jadwal_periksa (id_dokter, hari, jam_mulai, jam_selesai) 
+                                            VALUES ('$id_dokter', '$hari', '$jam_mulai', '$jam_selesai')");
         echo "<script> 
                 document.location='index.php';
-                </script>";
+              </script>";
     }
 
 ?>
@@ -134,12 +138,13 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Jadwal Periksa</h1>
+            <h1 class="m-0">Tambah Jadwal Periksa</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="../../dokter">Home</a></li>
-              <li class="breadcrumb-item active">Jadwal</li>
+              <li class="breadcrumb-item"><a href="../../dokter/jadwal">Jadwal Periksa</a></li>
+              <li class="breadcrumb-item active">Tambah Jadwal Periksa</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -151,70 +156,43 @@
     <section class="content">
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">Daftar Jadwal Periksa</h2>
-            <a class="btn btn-primary" href="/bk-poliklinik/dokter/jadwal/create.php" style="float: right;"><i class="fas fa-plus"></i> Tambah Jadwal Periksa</a>
+            <h2 class="card-title">Tambah Jadwal Periksa</h2>
         </div>
-<!-- Table -->
-            <div class="card-body p-0">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th style="width: 10px">No</th>
-                            <th>Nama Dokter</th>
-                            <th>Hari</th>
-                            <th>Jam Mulai</th>
-                            <th>Jam Selesai</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- PHP code to fetch and display data -->
-                        <?php
-                        // Pastikan $_SESSION['id'] sudah ada dan merupakan data yang valid
-                        if (isset($_SESSION['id']) && !empty($_SESSION['id'])) {
-                            // Lakukan query dengan parameterized query atau cara aman lainnya
-                            $query = "SELECT jadwal_periksa.*, dokter.nama 
-                                    FROM jadwal_periksa 
-                                    JOIN dokter ON jadwal_periksa.id_dokter = dokter.id 
-                                    WHERE jadwal_periksa.id_dokter = ?";
-                            
-                            // Siapkan statement
-                            $stmt = mysqli_prepare($mysqli, $query);
-                            
-                            // Bind parameter
-                            mysqli_stmt_bind_param($stmt, "i", $_SESSION['id']);
-                            
-                            // Eksekusi statement
-                            mysqli_stmt_execute($stmt);
-                            
-                            // Ambil hasil query
-                            $result = mysqli_stmt_get_result($stmt);
-                            
-                            $no = 1;
-                            while ($data = mysqli_fetch_array($result)) {
-                                ?>
-                                <tr>
-                                    <td><?php echo $no++ ?></td>
-                                    <td><?php echo htmlspecialchars($data['nama']) ?></td>
-                                    <td><?php echo htmlspecialchars($data['hari']) ?></td>
-                                    <td><?php echo htmlspecialchars($data['jam_mulai']) ?></td>
-                                    <td><?php echo htmlspecialchars($data['jam_selesai']) ?></td>
-                                    <td>
-                                        <a class="btn btn-success" href="/bk-poliklinik/dokter/jadwal/edit.php?id=<?php echo $data['id'] ?>">Ubah</a>
-                                        <a class="btn btn-danger" href="index.php?id=<?php echo $data['id'] ?>&aksi=hapus">Hapus</a>
-                                    </td>
-                                </tr>
-                                <?php
-                            }
-                        } else {
-                            // Jika $_SESSION['id'] tidak diatur, tampilkan pesan atau tindakan sesuai kebijakan aplikasi Anda
-                            echo '<tr><td colspan="6">Data tidak tersedia.</td></tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div class="card-body">
+            <form class="form-horizontal" method="POST" action="" name="myForm">
+                <div class="mb-3">
+                    <label for="inputNama" class="form-label fw-bold">Nama Dokter</label>
+                    <input type="text" class="form-control" name="nama_dokter" id="inputNama" placeholder="Nama Dokter" value="<?php echo $_SESSION['username']; ?>" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="inputHari" class="form-label fw-bold">Hari</label>
+                    <select class="form-control" name="hari" id="inputHari" required>
+                        <option value="">Pilih Hari</option>
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                        <option value="Sabtu">Sabtu</option>
+                        <option value="Minggu">Minggu</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="inputJamMulai" class="form-label fw-bold">Jam Mulai</label>
+                    <input type="time" class="form-control" name="jam_mulai" id="inputJamMulai" placeholder="Jam Mulai" required>
+                </div>
+                <div class="mb-3">
+                    <label for="inputJamSelesai" class="form-label fw-bold">Jam Selesai</label>
+                    <input type="time" class="form-control" name="jam_selesai" id="inputJamSelesai" placeholder="Jam Selesai" required>
+                </div>
+                <div class="mb-3 text-right">
+                    <button type="submit" class="btn btn-primary" name="simpan">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                </div>  
+            </form>
+        </div>   
+    </div>
     </section>
     <!-- /.content -->
   </div>

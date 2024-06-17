@@ -9,6 +9,13 @@
         exit;
     }
     include_once("../../koneksi.php");
+    $query = "SELECT dp.id, dp.no_antrian, p.nama AS nama_pasien, dp.keluhan, dp.status_periksa
+          FROM daftar_poli dp
+          INNER JOIN pasien p ON dp.id_pasien = p.id
+          INNER JOIN jadwal_periksa jp ON dp.id_jadwal = jp.id
+          INNER JOIN dokter d ON jp.id_dokter = d.id
+          WHERE d.id = '{$_SESSION['id']}'";
+    $result = mysqli_query($mysqli, $query);
 
 ?>
 
@@ -32,7 +39,7 @@
     <!-- Brand Logo -->
     <a href="/bk-poliklinik/" class="brand-link">
       <img src="/bk-poliklinik/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Poliklinik</span>
     </a>
 
     <!-- Sidebar -->
@@ -124,12 +131,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Memeriksa Pasien</h1>
+            <h1 class="m-0">Daftar Periksa Pasien</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="../../dokter">Home</a></li>
-              <li class="breadcrumb-item active">Periksa</li>
+              <li class="breadcrumb-item active">Memeriksa Pasien</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -138,8 +145,51 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <selction class="content">
-
+    <section class="content">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h2 class="card-title">Daftar Periksa Pasien</h2>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 100px">No Urut</th>
+                        <th>Nama Pasien</th>
+                        <th>Keluhan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php 
+                      while ($data = mysqli_fetch_assoc($result)) {
+                        $queryperiksa = "SELECT * FROM periksa WHERE id_daftar_poli = " . $data['id'];
+                        $resultperiksa = mysqli_query($mysqli, $queryperiksa);
+                        $datas = mysqli_fetch_assoc($resultperiksa);
+                    ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($data['no_antrian']); ?></td>
+                            <td><?php echo htmlspecialchars($data['nama_pasien']); ?></td>
+                            <td><?php echo htmlspecialchars($data['keluhan']); ?></td>
+                            <td>
+                                <?php if ($data['status_periksa'] == 'Selesai') : ?>
+                                    <a class="btn btn-warning" href="/bk-poliklinik/dokter/periksa/edit.php?id=<?php echo $datas['id']; ?>">
+                                        <i class="fa fa-edit"></i> Ubah
+                                    </a>
+                                <?php else : ?>
+                                    <a class="btn btn-primary" href="/bk-poliklinik/dokter/periksa/periksa.php?id=<?php echo $data['id']; ?>">
+                                        <i class="fa fa-stethoscope"></i> Periksa
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php 
+                      }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
     </section>
     <!-- /.content -->
   </div>

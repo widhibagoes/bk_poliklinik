@@ -9,7 +9,39 @@
       exit;
   }
     include_once("../../koneksi.php");
+    if (isset($_POST['simpan'])) {
+        if (isset($_POST['id'])) {
+            $ubah = mysqli_query($mysqli, "UPDATE pasien SET 
+                                            nama = '" . $_POST['nama'] . "',
+                                            alamat = '" . $_POST['alamat'] . "',
+                                            no_ktp = '" . $_POST['no_ktp'] . "',
+                                            no_hp = '" . $_POST['no_hp'] . "',
+                                            no_rm = '" . $_POST['no_rm'] . "'
+                                            WHERE
+                                            id = '" . $_POST['id'] . "'");
+        } else {
+            $tambah = mysqli_query($mysqli, "INSERT INTO pasien (nama, alamat, no_ktp, no_hp, no_rm) 
+                                            VALUES (
+                                                '" . $_POST['nama'] . "',
+                                                '" . $_POST['alamat'] . "',
+                                                '" . $_POST['no_ktp'] . "',
+                                                '" . $_POST['no_hp'] . "',
+                                                '" . $_POST['no_rm'] . "'
+                                            )");
+        }
+        echo "<script> 
+                document.location='index.php';
+                </script>";
+    }
+    if (isset($_GET['aksi'])) {
+        if ($_GET['aksi'] == 'hapus') {
+            $hapus = mysqli_query($mysqli, "DELETE FROM pasien WHERE id = '" . $_GET['id'] . "'");
+        }
 
+        echo "<script> 
+                document.location='index.php';
+                </script>";
+    }
 ?>
 
 <!DOCTYPE html>
@@ -32,16 +64,10 @@
     <!-- Brand Logo -->
     <a href="/bk-poliklinik/dokter/" class="brand-link">
       <img src="/bk-poliklinik/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Poliklinik</span>
     </a>
 
     <!-- Sidebar -->
-    <?php
-    if(!isset($_SESSION)) 
-    { 
-        session_start(); 
-    }
-?>
 <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -139,8 +165,108 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <selction class="content">
-
+    <section class="content">
+    <form class="form-horizontal" method="POST" action="" name="myForm">
+            <!-- PHP code to retrieve data if ID is set -->
+            <?php
+            $nama = '';
+            $alamat = '';
+            $no_ktp = '';
+            $no_hp = '';
+            $no_rm = '';
+            if (isset($_GET['id'])) {
+                $ambil = mysqli_query($mysqli, "SELECT * FROM pasien WHERE id='" . $_GET['id'] . "'");
+                while ($row = mysqli_fetch_array($ambil)) {
+                    $nama = $row['nama'];
+                    $alamat = $row['alamat'];
+                    $no_ktp = $row['no_ktp'];
+                    $no_hp = $row['no_hp'];
+                    $no_rm = $row['no_rm'];
+                }
+            ?>
+                <input type="hidden" name="id" value="<?php echo $_GET['id'] ?>">
+            <?php
+            } else{
+                $tahun_bulan = date("Ym");
+                $query_last_id = "SELECT MAX(CAST(SUBSTRING(no_rm, 8) AS SIGNED)) as last_queue_number FROM pasien";
+                $resultRm = mysqli_query($mysqli, $query_last_id);
+                $rowRm = mysqli_fetch_assoc($resultRm);
+                $lastQueueNumber = $rowRm['last_queue_number'];
+                $lastQueueNumber = $lastQueueNumber ? $lastQueueNumber : 0;
+                $newQueueNumber = $lastQueueNumber + 1;
+                $no_rm = $tahun_bulan. "-" . str_pad($newQueueNumber, 3, '0', STR_PAD_LEFT);
+            }
+            ?>
+                
+            <div class="mb-3">
+                <label for="inputNama" class="form-label fw-bold">Nama Pasien</label>
+                <input type="text" class="form-control" name="nama" id="inputNama" placeholder="Nama Pasien" value="<?php echo $nama ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="inputAlamat" class="form-label fw-bold">Alamat</label>
+                <input type="text" class="form-control" name="alamat" id="inputAlamat" placeholder="Alamat" value="<?php echo $alamat ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="inputKTP" class="form-label fw-bold">Nomor KTP</label>
+                <input type="text" class="form-control" name="no_ktp" id="inputKTP" placeholder="Nomor KTP" value="<?php echo $no_ktp ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="inputHP" class="form-label fw-bold">Nomor HP</label>
+                <input type="text" class="form-control" name="no_hp" id="inputHP" placeholder="Nomor HP" value="<?php echo $no_hp ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="inputRM" class="form-label fw-bold">Nomor RM</label>
+                <input type="text" class="form-control" name="no_rm" id="inputRM" placeholder="Nomor RM" value="<?php echo $no_rm ?>" readonly>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary rounded-pill px-3 mt-auto" name="simpan">Simpan</button>
+                <a class="btn btn-secondary rounded-pill px-3 mt-auto" href="index.php">Reset</a>
+            </div>  
+        </form>
+<!-- Table -->
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Data Pasien</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">No</th>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th>No. KTP</th>
+                            <th>No. HP</th>
+                            <th>No. RM</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- PHP code to fetch and display data -->
+                        <?php
+                        $result = mysqli_query($mysqli, "SELECT * FROM pasien");
+                        $no = 1;
+                        while ($data = mysqli_fetch_array($result)) {
+                        ?>
+                            <tr>
+                                <td><?php echo $no++ ?></td>
+                                <td><?php echo $data['nama'] ?></td>
+                                <td><?php echo $data['alamat'] ?></td>
+                                <td><?php echo $data['no_ktp'] ?></td>
+                                <td><?php echo $data['no_hp'] ?></td>
+                                <td><?php echo $data['no_rm'] ?></td>
+                                <td>
+                                    <a class="btn btn-success" href="index.php?id=<?php echo $data['id'] ?>">Ubah</a>
+                                    <a class="btn btn-danger" href="index.php?id=<?php echo $data['id'] ?>&aksi=hapus">Hapus</a>
+                                </td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </section>
     <!-- /.content -->
   </div>

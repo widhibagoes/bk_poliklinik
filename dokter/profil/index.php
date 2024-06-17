@@ -8,8 +8,18 @@
         header("Location: /bk-poliklinik/");
         exit;
     }
-    include_once("../../koneksi.php");
+    include("../../koneksi.php");
 
+    if (isset($_POST['simpan'])) {
+        if (isset($_SESSION['id'])) {
+            $ubah = mysqli_query($mysqli, "UPDATE dokter SET 
+                                            nama = '" . $_POST['nama'] . "',
+                                            alamat = '" . $_POST['alamat'] . "',
+                                            no_hp = '" . $_POST['telepon'] . "'
+                                            WHERE
+                                            id = '" . $_SESSION['id'] . "'");
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +42,7 @@
     <!-- Brand Logo -->
     <a href="/bk-poliklinik/" class="brand-link">
       <img src="/bk-poliklinik/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Poliklinik</span>
     </a>
 
     <!-- Sidebar -->
@@ -138,9 +148,51 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <selction class="content">
+    <section class="content">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Edit Data Dokter</h3>
+        </div>
+        <!-- /.card-header -->
+        <!-- form start -->
+        <form method="POST" action="" name="myForm">
+        <?php
+            $nama = '';
+            $alamat = '';
+            $telepon = '';
+            if (isset($_SESSION['id'])) {
+                $ambil = mysqli_query($mysqli, "SELECT * FROM dokter WHERE id='" . $_SESSION['id'] . "'");
+                while ($row = mysqli_fetch_array($ambil)) {
+                    $nama = $row['nama'];
+                    $alamat = $row['alamat'];
+                    $telepon = $row['no_hp'];
+                }
+            ?>
+            <?php
+            }
+            ?>
+            <div class="card-body">
+            <input type="hidden" name="id" value="<?php echo $_SESSION['id']; ?>">
+                <div class="form-group">
+                    <label for="namaDokter">Nama Dokter</label>
+                    <input type="text" class="form-control" name="nama" id="namaDokter" value="<?php echo $nama ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="alamatDokter">Alamat Dokter</label>
+                    <input type="text" class="form-control" name="alamat" id="alamatDokter" value="<?php echo $alamat ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="teleponDokter">Telepon Dokter</label>
+                    <input type="text" class="form-control" name="telepon" id="teleponDokter" value="<?php echo $telepon ?>" required>
+                </div>
+            </div>
+            <div class="card-body text-center">
+                <button type="submit" class="btn btn-primary" name="simpan">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</section>
 
-    </section>
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->

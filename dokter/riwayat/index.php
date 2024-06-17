@@ -1,15 +1,30 @@
 <?php
-    if(!isset($_SESSION)) 
-    { 
+    // Memastikan session dimulai
+    if(!isset($_SESSION)) {
         session_start(); 
-    } 
+    }
+
+    // Memeriksa apakah pengguna sudah login sebagai dokter
     if (!isset($_SESSION['username']) || $_SESSION['role'] != 'dokter') {
-        // Jika pengguna sudah login, tampilkan tombol "Logout"
         header("Location: /bk-poliklinik/");
         exit;
     }
+
+    // Menghubungkan ke database
     include_once("../../koneksi.php");
 
+    // Query untuk mengambil riwayat pasien yang ditangani oleh dokter yang sedang login
+    $query = "SELECT px.id AS id_periksa, p.nama AS nama_pasien, p.alamat, p.no_ktp, p.no_hp, p.no_rm, px.tgl_periksa, d.nama AS nama_dokter, dp.keluhan, px.catatan, GROUP_CONCAT(o.nama_obat SEPARATOR ', ') AS obat_diberikan, px.biaya_periksa
+              FROM daftar_poli dp
+              JOIN pasien p ON dp.id_pasien = p.id
+              JOIN periksa px ON dp.id = px.id_daftar_poli
+              JOIN detail_periksa dx ON px.id = dx.id_periksa
+              JOIN obat o ON dx.id_obat = o.id
+              JOIN jadwal_periksa jp ON dp.id_jadwal = jp.id
+              JOIN dokter d ON jp.id_dokter = d.id
+              WHERE d.id = '{$_SESSION['id']}' AND dp.status_periksa = 'Selesai'
+              GROUP BY px.id";  // Group by periksa untuk menggabungkan data obat per periksa
+    $result = mysqli_query($mysqli, $query);
 ?>
 
 <!DOCTYPE html>
@@ -32,16 +47,10 @@
     <!-- Brand Logo -->
     <a href="/bk-poliklinik/" class="brand-link">
       <img src="/bk-poliklinik/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Poliklinik</span>
     </a>
 
     <!-- Sidebar -->
-    <?php
-    if(!isset($_SESSION)) 
-    { 
-        session_start(); 
-    }
-    ?>
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -138,9 +147,108 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <selction class="content">
+    <section class="content">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h2 class="card-title">Riwayat Pasien</h2>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 10px;">No</th>
+                        <th>Nama Pasien</th>
+                        <th>Alamat</th>
+                        <th>No. KTP</th>
+                        <th>No. Telepon</th>
+                        <th>No. RM</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $no = 1;
+                        while ($data = mysqli_fetch_assoc($result)) {
+                    ?>
+                        <tr>
+                            <td><?php echo $no++; ?></td>
+                            <td><?php echo htmlspecialchars($data['nama_pasien']); ?></td>
+                            <td><?php echo htmlspecialchars($data['alamat']); ?></td>
+                            <td><?php echo htmlspecialchars($data['no_ktp']); ?></td>
+                            <td><?php echo htmlspecialchars($data['no_hp']); ?></td>
+                            <td><?php echo htmlspecialchars($data['no_rm']); ?></td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalDetail<?php echo $data['id_periksa']; ?>">
+                                    <i class="fa fa-eye"></i> Detail Riwayat Periksa
+                                </button>
+                            </td>
+                        </tr>
+                    <?php 
+                        }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    </section>
+    <!-- Modals -->
+    <?php
+        mysqli_data_seek($result, 0); // Mengembalikan kursor data ke awal
+        while ($data = mysqli_fetch_assoc($result)) {
+    ?>
+    <div class="modal fade" id="modalDetail<?php echo $data['id_periksa']; ?>" tabindex="-1" aria-labelledby="modalDetailLabel<?php echo $data['id_periksa']; ?>" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDetailLabel<?php echo $data['id_periksa']; ?>">Riwayat Periksa <?php echo htmlspecialchars($data['nama_pasien']); ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">No</th>
+                                <th scope="col">Tanggal Periksa</th>
+                                <th scope="col">Nama Pasien</th>
+                                <th scope="col">Nama Dokter</th>
+                                <th scope="col">Keluhan</th>
+                                <th scope="col">Catatan</th>
+                                <th scope="col">Obat</th>
+                                <th scope="col">Biaya</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                                $no = 1;
+                            ?>
+                            <tr>
+                                <td><?php echo $no++; ?></td>
+                                <td><?php echo date('d F Y', strtotime($data['tgl_periksa'])); ?></td>
+                                <td><?php echo htmlspecialchars($data['nama_pasien']); ?></td>
+                                <td><?php echo htmlspecialchars($data['nama_dokter']); ?></td>
+                                <td><?php echo htmlspecialchars($data['keluhan']); ?></td>
+                                <td><?php echo htmlspecialchars($data['catatan']); ?></td>
+                                <td><?php echo htmlspecialchars($data['obat_diberikan']); ?></td>
+                                <td>Rp <?php echo number_format($data['biaya_periksa'], 0, ',', '.'); ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php 
+        }
+    ?>
+</section>
+
+
+
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
@@ -154,3 +262,4 @@
 <!-- ./wrapper -->
 </body>
 </html>
+

@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       <form action="" method="post">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Full name" name="username">
+          <input type="text" class="form-control" placeholder="Full name" name="username" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Alamat" name="alamat">
+          <input type="text" class="form-control" placeholder="Alamat" name="alamat" required>
           <div class="input-group-append">
             <div class="input-group-text">
             <span class="fas fa-map-marked-alt"></span>
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="number" class="form-control" placeholder="No KTP" name="ktp">
+          <input type="number" class="form-control" placeholder="No KTP" name="ktp" required>
           <div class="input-group-append">
             <div class="input-group-text">
             <span class="fas fa-id-card"></span>
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="number" class="form-control" placeholder="No HP" name="hp">
+          <input type="number" class="form-control" placeholder="No HP" name="hp" required>
           <div class="input-group-append">
             <div class="input-group-text">
             <span class="fas fa-phone"></span>
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <button type="submit" class="btn btn-primary btn-block" id="registerBtn" disabled>Register</button>
           </div>
           <!-- /.col -->
         </div>
@@ -149,5 +149,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <script src="/bk-poliklinik/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="/bk-poliklinik/dist/js/adminlte.min.js"></script>
+
+<script>
+        document.getElementById('agreeTerms').addEventListener('change', function() {
+            document.getElementById('registerBtn').disabled = !this.checked;
+        });
+    </script>
 </body>
 </html>

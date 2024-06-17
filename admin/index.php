@@ -10,6 +10,30 @@
   }
     include_once("../koneksi.php");
 
+    // Query untuk menghitung jumlah pasien
+    $query_pasien = "SELECT COUNT(*) as jumlah_pasien FROM pasien";
+    $result_pasien = mysqli_query($mysqli, $query_pasien);
+    $row_pasien = mysqli_fetch_assoc($result_pasien);
+    $jumlah_pasien = $row_pasien['jumlah_pasien'];
+
+    // Query untuk menghitung jumlah dokter
+    $query_dokter = "SELECT COUNT(*) as jumlah_dokter FROM dokter";
+    $result_dokter = mysqli_query($mysqli, $query_dokter);
+    $row_dokter = mysqli_fetch_assoc($result_dokter);
+    $jumlah_dokter = $row_dokter['jumlah_dokter'];
+
+    // Query untuk menghitung jumlah poli
+    $query_poli = "SELECT COUNT(*) as jumlah_poli FROM poli";
+    $result_poli = mysqli_query($mysqli, $query_poli);
+    $row_poli = mysqli_fetch_assoc($result_poli);
+    $jumlah_poli = $row_poli['jumlah_poli'];
+
+    // Query untuk menghitung jumlah obat
+    $query_obat = "SELECT COUNT(*) as jumlah_obat FROM obat";
+    $result_obat = mysqli_query($mysqli, $query_obat);
+    $row_obat = mysqli_fetch_assoc($result_obat);
+    $jumlah_obat = $row_obat['jumlah_obat'];
+
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +56,7 @@
     <!-- Brand Logo -->
     <a href="/bk-poliklinik/" class="brand-link">
       <img src="/bk-poliklinik/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Poliklinik</span>
     </a>
 
     <!-- Sidebar -->
@@ -139,8 +163,68 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <selction class="content">
-
+    <section class="content">
+        <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3><?php echo $jumlah_dokter; ?></h3>
+                <p>Dokter</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-user-md"></i>
+              </div>
+              <a href="../admin/dokter/" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3><?php echo $jumlah_pasien; ?></h3>
+                <p>Pasien</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-user-injured"></i>
+              </div>
+              <a href="../admin/pasien/" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3><?php echo $jumlah_poli; ?></h3>
+                <p>Poli</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-hospital"></i>
+              </div>
+              <a href="../admin/poli/" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3><?php echo $jumlah_obat; ?></h3>
+                <p>Jenis Obat</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-pills"></i>
+              </div>
+              <a href="../admin/obat/" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+        </div>
+      </div> <!-- /.container-fluid -->
     </section>
     <!-- /.content -->
   </div>

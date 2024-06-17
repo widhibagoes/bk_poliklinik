@@ -9,6 +9,35 @@
       exit;
   }
     include_once("../../koneksi.php");
+    if (isset($_POST['simpan'])) {
+        if (isset($_POST['id'])) {
+            $ubah = mysqli_query($mysqli, "UPDATE obat SET 
+                                            nama_obat = '" . $_POST['nama_obat'] . "',
+                                            kemasan = '" . $_POST['kemasan'] . "',
+                                            harga = '" . $_POST['harga'] . "'
+                                            WHERE
+                                            id = '" . $_POST['id'] . "'");
+        } else {
+            $tambah = mysqli_query($mysqli, "INSERT INTO obat (nama_obat, kemasan, harga) 
+                                            VALUES (
+                                                '" . $_POST['nama_obat'] . "',
+                                                '" . $_POST['kemasan'] . "',
+                                                '" . $_POST['harga'] . "'
+                                            )");
+        }
+        echo "<script> 
+                document.location='index.php';
+                </script>";
+    }
+    if (isset($_GET['aksi'])) {
+        if ($_GET['aksi'] == 'hapus') {
+            $hapus = mysqli_query($mysqli, "DELETE FROM obat WHERE id = '" . $_GET['id'] . "'");
+        }
+
+        echo "<script> 
+                document.location='index.php';
+                </script>";
+    }
 
 ?>
 
@@ -32,7 +61,7 @@
     <!-- Brand Logo -->
     <a href="/bk-poliklinik/dokter/" class="brand-link">
       <img src="/bk-poliklinik/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Poliklinik</span>
     </a>
 
     <!-- Sidebar -->
@@ -139,8 +168,81 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <selction class="content">
-
+    <section class="content">
+        <form class="form-horizontal" method="POST" action="" name="myForm">
+            <!-- PHP code to retrieve data if ID is set -->
+            <?php
+            $nama_obat = '';
+            $kemasan = '';
+            $harga = '';
+            if (isset($_GET['id'])) {
+                $ambil = mysqli_query($mysqli, "SELECT * FROM obat WHERE id='" . $_GET['id'] . "'");
+                while ($row = mysqli_fetch_array($ambil)) {
+                    $nama_obat = $row['nama_obat'];
+                    $kemasan = $row['kemasan'];
+                    $harga = $row['harga'];
+                }
+            ?>
+                <input type="hidden" name="id" value="<?php echo $_GET['id'] ?>">
+            <?php
+            }
+            ?>
+            <div class="mb-3">
+                <label for="inputNama" class="form-label fw-bold">Nama Obat</label>
+                <input type="text" class="form-control" name="nama_obat" id="inputNama" placeholder="Nama Obat" value="<?php echo $nama_obat ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="inputKemasan" class="form-label fw-bold">Kemasan</label>
+                <input type="text" class="form-control" name="kemasan" id="inputKemasan" placeholder="kemasan" value="<?php echo $kemasan ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="inputHarga" class="form-label fw-bold">Harga</label>
+                <input type="text" class="form-control" name="harga" id="inputHarga" placeholder="harga" value="<?php echo $harga ?>" required>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary rounded-pill px-3 mt-auto" name="simpan">Simpan</button>
+            </div>  
+        </form>  
+<!-- Table -->
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Data Obat</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">No</th>
+                            <th>Nama Obat</th>
+                            <th>Kemasan</th>
+                            <th>Harga</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- PHP code to fetch and display data -->
+                        <?php
+                        $result = mysqli_query($mysqli, "SELECT * FROM obat");
+                        $no = 1;
+                        while ($data = mysqli_fetch_array($result)) {
+                        ?>
+                            <tr>
+                                <td><?php echo $no++ ?></td>
+                                <td><?php echo $data['nama_obat'] ?></td>
+                                <td><?php echo $data['kemasan'] ?></td>
+                                <td>Rp <?php echo number_format($data['harga'], 0, ',', '.'); ?></td>
+                                <td>
+                                    <a class="btn btn-success" href="index.php?id=<?php echo $data['id'] ?>">Ubah</a>
+                                    <a class="btn btn-danger" href="index.php?id=<?php echo $data['id'] ?>&aksi=hapus">Hapus</a>
+                                </td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </section>
     <!-- /.content -->
   </div>

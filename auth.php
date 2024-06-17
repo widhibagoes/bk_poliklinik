@@ -18,6 +18,9 @@ if($username == 'admin'){
 }else{
     $query = mysqli_query($mysqli,"SELECT * FROM dokter WHERE nama='$username' AND alamat='$password'");
     if(mysqli_num_rows($query)==1){
+        $row = mysqli_fetch_assoc($query);
+        // $id_dokter = $row['id'];
+        $_SESSION['id'] = $row['id'];
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'dokter';
         header('Location: /bk-poliklinik/dokter');
